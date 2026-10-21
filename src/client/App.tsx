@@ -20,6 +20,7 @@ import {
   Plus,
   Search,
   Settings2,
+  Target,
   Trash2,
   X,
 } from 'lucide-react';
@@ -46,6 +47,7 @@ import { ThreadList } from './ThreadList';
 import { ResultPane } from './ResultPane';
 import { TaskRow } from './TaskPresentation';
 import { TaskActions } from './TaskActions';
+import { GoalsPanel } from './GoalsPanel';
 import { WorkspaceDialog, type Dialog } from './WorkspaceDialog';
 import { submitComposerOnEnter } from './chat-composer';
 
@@ -62,9 +64,9 @@ export function App() {
   const [workspace, setWorkspace] = useState<WorkspaceState>();
   const [selectedDot, setSelectedDot] = useState('');
   const [selectedThread, setSelectedThread] = useState<string>();
-  const [view, rawSetView] = useState<'chat' | 'tasks' | 'memories' | 'space'>(
-    'chat',
-  );
+  const [view, rawSetView] = useState<
+    'chat' | 'tasks' | 'goals' | 'memories' | 'space'
+  >('chat');
   const dirtyPage = useRef(false);
   const [spaceId, setSpaceId] = useState('');
   const [pageId, setPageId] = useState<string>();
@@ -225,7 +227,13 @@ export function App() {
     setPendingPrompt(undefined);
   };
   const newConversation = async (text?: string) => {
-    if (!dot || !configured || busy) return;
+    if (!dot || busy) return;
+    if (!configured) {
+      setError(
+        `Chat is not configured yet. Add ${workspace?.setup.missing.join(', ')} to the server's .env file and restart OpenDots. Your draft stays in the composer.`,
+      );
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -322,11 +330,7 @@ export function App() {
         >
           <PanelLeft size={18} />
         </button>
-        <button
-          aria-label="New chat"
-          disabled={!configured}
-          onClick={() => void newConversation()}
-        >
+        <button aria-label="New chat" onClick={() => void newConversation()}>
           <Plus size={19} />
         </button>
         <button
@@ -385,7 +389,6 @@ export function App() {
         </button>
         <button
           className="new-chat nav-item"
-          disabled={!configured}
           onClick={() => void newConversation()}
         >
           <Plus size={17} />
@@ -473,6 +476,17 @@ export function App() {
         )}
         <div className="sidebar-bottom">
           <button
+            className={`nav-item ${view === 'goals' ? 'active' : ''}`}
+            onClick={() => {
+              setView('goals');
+              setMobile(false);
+            }}
+          >
+            <Target size={17} />
+            <span>Goals & reminders</span>
+            {state.goals.length > 0 && <small>{state.goals.length}</small>}
+          </button>
+          <button
             className={`nav-item ${view === 'tasks' ? 'active' : ''}`}
             onClick={() => {
               setView('tasks');
@@ -539,9 +553,11 @@ export function App() {
                 ? dot.name
                 : view === 'tasks'
                   ? 'Activity'
-                  : view === 'space'
-                    ? 'Pages'
-                    : 'Memories'}
+                  : view === 'goals'
+                    ? 'Goals & reminders'
+                    : view === 'space'
+                      ? 'Pages'
+                      : 'Memories'}
             </strong>
           </div>
           <div className="top-actions">
@@ -662,9 +678,11 @@ export function App() {
                       <div>
                         <strong>Connect your Dot</strong>
                         <p>
-                          Connect your model and conversation service in
-                          Settings to start chatting. Your Spaces and Dot
-                          preferences are ready to use.
+                          Add the missing server configuration (
+                          {workspace.setup.missing.join(', ')}) to the server’s
+                          <code> .env</code> file and restart OpenDots to start
+                          chatting. You can draft a message below; it stays in
+                          the composer until setup is complete.
                         </p>
                         <p>
                           Setup and usage metadata is collected by default.{' '}
@@ -698,18 +716,14 @@ export function App() {
                       placeholder={
                         configured
                           ? `Message ${dot.name}…`
-                          : 'Your first conversation starts after setup.'
+                          : `Draft a message to ${dot.name}…`
                       }
                       value={prompt}
                       maxLength={4000}
                       onChange={(e) => setPrompt(e.target.value)}
                       onKeyDown={(e) =>
-                        submitComposerOnEnter(
-                          e,
-                          configured && !busy && !!prompt.trim(),
-                        )
+                        submitComposerOnEnter(e, !busy && !!prompt.trim())
                       }
-                      disabled={!configured}
                     />
                     <div className="composer-bottom">
                       <span>
@@ -719,7 +733,7 @@ export function App() {
                       <button
                         className="send-button"
                         aria-label="Start conversation"
-                        disabled={!configured || busy || !prompt.trim()}
+                        disabled={busy || !prompt.trim()}
                       >
                         <ArrowUp size={19} />
                       </button>
@@ -733,7 +747,7 @@ export function App() {
                     ].map((text) => (
                       <button
                         key={text}
-                        disabled={!configured}
+                        disabled={busy}
                         onClick={() => setPrompt(text)}
                       >
                         {text}
@@ -775,12 +789,16 @@ export function App() {
                 <h1>
                   {view === 'memories'
                     ? 'Memories'
-                    : 'A little follow-through.'}
+                    : view === 'goals'
+                      ? 'Goals & reminders'
+                      : 'A little follow-through.'}
                 </h1>
                 <p>
                   {view === 'memories'
                     ? 'Preferences you choose to share with your Dots.'
-                    : 'Scheduled turns run on the server in their original conversation.'}
+                    : view === 'goals'
+                      ? 'Keep responsibilities, progress, and one-time reminders in your workspace.'
+                      : 'Scheduled turns run on the server in their original conversation.'}
                 </p>
               </div>
               {view === 'memories' && (
@@ -793,7 +811,9 @@ export function App() {
                 </button>
               )}
             </div>
-            {view === 'memories' ? (
+            {view === 'goals' ? (
+              <GoalsPanel goals={state.goals} mutate={mutate} />
+            ) : view === 'memories' ? (
               <>
                 <div className="memory-grid">
                   {state.memories.map((memory) => (

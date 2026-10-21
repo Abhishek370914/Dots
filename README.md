@@ -1,26 +1,24 @@
 <div align="center">
 
-# OpenDots
+# Dots
 
-### Always-on AI coworkers that move between text, calls, and Slack.
+### A self-hosted AI workspace for conversations, projects, and follow-through.
 
-**An open-source template for persistent AI agents, each with its own computer. Available on Web and Mobile.**
+**Personalized and maintained by [Abhishek R](https://github.com/Abhishek370914).**
 
-Built with [CopilotKit](https://github.com/CopilotKit/CopilotKit) and [AG-UI](https://docs.ag-ui.com/introduction). · [Get started](#get-started) · [Overview](#overview) · [Architecture](#architecture) · [Features](#features) · [Contributing](CONTRIBUTING.md)
+Dots is my customization of the open-source [OpenDots](https://github.com/CopilotKit/OpenDots) project. It retains the upstream MIT license and notices; the app UI and some setup references still use the OpenDots name.
 
-[![CI](https://github.com/CopilotKit/OpenDots/actions/workflows/ci.yml/badge.svg)](https://github.com/CopilotKit/OpenDots/actions/workflows/ci.yml)
+[![CI](https://github.com/Abhishek370914/Dots/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek370914/Dots/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 ![Alpha](https://img.shields.io/badge/status-alpha-orange.svg)
 
-<a href="https://trendshift.io/repositories/275323" target="_blank"><img src="https://trendshift.io/api/badge/trendshift/repositories/275323/daily?language=TypeScript" alt="CopilotKit/OpenDots | Trendshift #2 TypeScript Repository Of The Day" width="250" height="55"/></a>
-
-Host OpenDots on your own infrastructure. Conversations require CopilotKit Intelligence: use the hosted service, the [local Docker evaluation](docs/SETUP.md#local-intelligence-evaluation), or a licensed [self-hosted deployment](https://docs.copilotkit.ai/intelligence/self-hosting). Clone this template and customize it however you want.
-
-[**Building on OpenDots? Meet with the CopilotKit team →**](https://www.copilotkit.ai/talk-to-an-engineer?ref=opendots_readme)
+Built with [CopilotKit](https://github.com/CopilotKit/CopilotKit) and [AG-UI](https://docs.ag-ui.com/introduction). · [Get started](#get-started) · [Overview](#overview) · [Architecture](#architecture) · [Features](#features) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
+
+**Self-hosted software, not a hosted service.** Run it on your own machine or server. Conversations require CopilotKit Intelligence and a configured model provider; follow [Get started](#get-started) and [Setup](docs/SETUP.md).
 
 <div align="center">
 
@@ -167,8 +165,8 @@ You configure the Intelligence project, model provider, and channel connection f
 Use **Node.js 24** and **npm**:
 
 ```sh
-git clone https://github.com/CopilotKit/OpenDots.git
-cd OpenDots
+git clone https://github.com/Abhishek370914/Dots.git
+cd Dots
 npm ci
 cp .env.example .env
 npm run dev
@@ -207,6 +205,7 @@ CopilotKit SDK telemetry collects usage metadata separately from conversation pe
 | Slack                      | Managed Channels SDK declaration with workspace and user allowlists                                                                     |
 | Calls                      | WebRTC speech, delegated compute, bounded sessions, hangup, and timeline receipts                                                       |
 | Background work            | Scheduled server-side turns in their original conversation, with pause and retry controls                                               |
+| Goals and reminders        | SQLite-backed responsibilities, editable progress and status, and one dismissible one-time reminder per goal                            |
 | Browser                    | Separate read-only public-page service with page capture and navigation limits                                                          |
 | Dot computers              | Per-Dot browser profiles, files, shell, takeover, permissions, and action records through OpenBot                                       |
 | Connections                | Per-Dot MCP servers, Composio connected apps, per-tool access, and owner approval for MCP write actions                                 |
@@ -221,13 +220,13 @@ Local checks cover setup, persistence, permissions, SDK failure handling, and br
 
 Automatic Learning routing and skill delivery are configured locally. Cloud schedules, eligible-thread counts, and published-skill delivery still need connected-service verification. Skills require review and publication in Intelligence; existing conversations without a container are not enrolled retroactively.
 
-This is a single-owner starting point. Shared editing, invitations, file uploads, and interactive page embeds are not included. Schedules are recurring instructions, not a complete goal or event-trigger system. Specialist Dots have separate roles and conversations; multi-Dot group conversations and automatic delegation are further work.
+This is a single-owner starting point. Shared editing, invitations, file uploads, and interactive page embeds are not included. Goals and their one-time reminders are managed in the workspace; due reminders appear there for the owner to dismiss, and do not send external notifications or trigger agent work. Recurring schedules remain a separate feature. Specialist Dots have separate roles and conversations; multi-Dot group conversations and automatic delegation are further work.
 
 ### Extending the template
 
 - Add identity, Space membership, and shared page editing for multi-user deployments.
 - Add file attachments and richer page content.
-- Add event triggers and a persistent responsibility lifecycle.
+- Add optional notification delivery for reminders with explicit provider setup and owner controls.
 - Extend tools and approval flows for your own workflows.
 - Add richer artifacts, connected-app context, and specialist coordination.
 
@@ -235,8 +234,15 @@ This is a single-owner starting point. Shared editing, invitations, file uploads
 
 See [Contributing](CONTRIBUTING.md) for development guidance and [Security](SECURITY.md) for reporting issues. Contributions should describe the workflow they enable, include verification evidence, and distinguish live integrations from fixtures.
 
+## Maintainer and upstream
+
+Maintained by [Abhishek R](https://github.com/Abhishek370914). For questions or issues, use [GitHub Issues](https://github.com/Abhishek370914/Dots/issues). Git commits use GitHub's noreply address for the maintainer account; it is not a support inbox.
+
+This project is based on [CopilotKit/OpenDots](https://github.com/CopilotKit/OpenDots). The original project and its applicable notices remain credited in the source history and [MIT license](LICENSE). The Dots name and repository are this maintained customization, not an official CopilotKit product.
+
 ## References
 
+- [OpenDots upstream repository](https://github.com/CopilotKit/OpenDots)
 - [AG-UI documentation](https://docs.ag-ui.com/introduction)
 - [CopilotKit documentation](https://docs.copilotkit.ai/intelligence/overview)
 - [Channels SDK](https://github.com/CopilotKit/channels-sdk)
